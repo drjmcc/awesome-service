@@ -1,0 +1,11 @@
+{
+  "environment": 4,
+  "awsAccountNumber": "",
+  "awsRegion": "eu-west-1",
+  "outputPrefix": "PROD1",
+  "domainName": "",
+  "environmentVariables": {
+    "releaseVersion": "prodreleasehash",
+    "environmentName": "Prod"
+  }
+}

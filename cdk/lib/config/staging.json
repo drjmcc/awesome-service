@@ -1,0 +1,17 @@
+{
+  "environment": 3,
+  "awsAccountNumber": "",
+  "awsRegion": "eu-west-1",
+  "outputPrefix": "STAGING",
+  "domainName": "",
+  "environmentVariables": {
+    "releaseVersion": "stagingreleasehash",
+    "environmentName": "Staging"
+  },
+  "emailLambdaSettings": {
+    "timeout": 15,
+    "environmentVariables": {
+      "logLevel": "info"
+    }
+  }
+}

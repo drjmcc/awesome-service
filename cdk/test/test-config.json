@@ -1,0 +1,11 @@
+{
+  "environment": 0,
+  "awsAccountNumber": "123456789",
+  "awsRegion": "eu-west-1",
+  "outputPrefix": "TEST",
+  "domainName": "awesome.api.test.service.dev",
+  "environmentVariables": {
+    "releaseVersion": "testreleasehash",
+    "environmentName": "Test"
+  }
+}

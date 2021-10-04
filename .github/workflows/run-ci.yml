@@ -1,0 +1,57 @@
+on:
+  push:
+    branches: "**"
+
+name: Serverless CI
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install all dependencies
+        working-directory: ./cdk
+        run: yarn install
+      - name: Lint
+        working-directory: ./cdk
+        run: yarn run lint
+      - name: Build
+        working-directory: ./cdk
+        run: yarn run build
+      - name: Deploy
+        working-directory: ./cdk
+        run: yarn run cdk -- deploy --require-approval never --exclusively DEVAwesomeServiceComputeStack
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          RELEASE_HASH: ${{ github.sha }}
+
+  promote-service:
+    name: Promote To Staging & Prod
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
+      - name: Configure Dev AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.DEV_AWS_REGION }}
+      - uses: marceloprado/has-changed-path@v1
+        id: changed-code
+        with:
+          paths: cdk src .github/workflows/run-ci.yml
+      - name: Trigger CD Pipeline
+        uses: zulhfreelancer/aws-codepipeline-action@v1.0.7
+        if: steps.changed-code.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+        with:
+          aws-region: ${{ secrets.DEV_AWS_REGION }}
+          aws-access-key: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          pipeline-name: AwesomeServicePipeline

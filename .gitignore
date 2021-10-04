@@ -1,0 +1,12 @@
+node_modules
+.aws-sam
+dist/
+package/
+
+# dotenv environment variables file
+.env
+.env.test
+env.json
+.vscode/launch.json
+.DS_Store
+.vscode/settings.json

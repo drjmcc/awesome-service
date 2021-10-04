@@ -1,0 +1,29 @@
+name: Development Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: Git Ref (Optional)
+        required: false
+
+jobs:
+  deploy:
+    name: Deploy To Dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install all dependencies
+        working-directory: ./cdk
+        run: npm install
+      - name: Build
+        working-directory: ./cdk
+        run: npm run build
+      - name: Deploy
+        working-directory: ./cdk
+        run: npm run cdk -- deploy --require-approval never --exclusively DEVAwesomeServiceComputeStack
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          RELEASE_HASH: ${{ github.sha }}

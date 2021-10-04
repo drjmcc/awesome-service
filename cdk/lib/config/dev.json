@@ -1,0 +1,11 @@
+{
+  "environment": 2,
+  "awsAccountNumber": "597524826433",
+  "awsRegion": "eu-west-1",
+  "outputPrefix": "DEV",
+  "domainName": "",
+  "environmentVariables": {
+    "releaseVersion": "devreleasehash",
+    "environmentName": "Dev"
+  }
+}
