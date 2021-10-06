@@ -1,1 +1,4 @@
-{}
+{
+  "ssm:account=597524826433:parameterName=/dev/cognito/user-pool-client/clientcreds/client-id:region=eu-west-1": "2lpiuijr1tiioqc0fp4pibu2u1",
+  "ssm:account=597524826433:parameterName=/dev/cognito/user-pool/arn:region=eu-west-1": "arn:aws:cognito-idp:eu-west-1:597524826433:userpool/eu-west-1_huSoYrmP3"
+}

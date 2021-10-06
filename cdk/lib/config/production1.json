@@ -4,6 +4,7 @@
   "awsRegion": "eu-west-1",
   "outputPrefix": "PROD1",
   "domainName": "",
+  "issuer": "",
   "environmentVariables": {
     "releaseVersion": "prodreleasehash",
     "environmentName": "Prod"

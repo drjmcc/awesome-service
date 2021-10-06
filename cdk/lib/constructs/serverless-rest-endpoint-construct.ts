@@ -1,16 +1,15 @@
 import * as cdk from "@aws-cdk/core";
 import * as apigateway from "@aws-cdk/aws-apigatewayv2";
-// import * as apigatewayAuthorizers from "@aws-cdk/aws-apigatewayv2-authorizers";
+import * as apigatewayAuthorizers from "@aws-cdk/aws-apigatewayv2-authorizers";
 import * as apigatewayIntegrations from "@aws-cdk/aws-apigatewayv2-integrations";
-// import * as certificatemanager from "@aws-cdk/aws-certificatemanager";
 import * as lambdaNodeJs from "@aws-cdk/aws-lambda-nodejs";
 
 import { ServerlessRestEndpointConstructProps } from "./serverless-rest-endpoint-construct-props";
 import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
 import { CorsHttpMethod } from "@aws-cdk/aws-apigatewayv2";
+import { ssmStringParameterLookupWithDummyValue } from "../helpers/ssm";
 
 export class ServerlessRestEndpointConstruct extends cdk.Construct {
-  // public domainName: apigateway.IDomainName;
   public gateway: apigateway.HttpApi;
   public lambdaFunctions: NodejsFunction[];
   constructor(
@@ -20,25 +19,12 @@ export class ServerlessRestEndpointConstruct extends cdk.Construct {
   ) {
     super(scope, id);
 
-    // const apiCert = new certificatemanager.DnsValidatedCertificate(
-    //   this,
-    //   `${props.gatewayId}DomainCert`,
-    //   {
-    //     domainName: props.domainName,
-    //     // ? Doc's say default is email, but I think that is mistake.
-    //     validationMethod: certificatemanager.ValidationMethod.DNS,
-    //     hostedZone: props.hostedZone
-    //   }
-    // );
-
-    // this.domainName = new apigateway.DomainName(
-    //   this,
-    //   `${props.gatewayId}DomainName`,
-    //   {
-    //     domainName: props.domainName,
-    //     certificate: apiCert
-    //   }
-    // );
+    const fakeArn = "arn:aws:service:region:number:type:MissingValue-secret";
+    const clientCredsClientId = ssmStringParameterLookupWithDummyValue(
+      this,
+      `/dev/cognito/user-pool-client/clientcreds/client-id`,
+      fakeArn
+    );
 
     this.gateway = new apigateway.HttpApi(this, props.gatewayId, {
       // defaultDomainMapping: {
@@ -57,32 +43,34 @@ export class ServerlessRestEndpointConstruct extends cdk.Construct {
     });
 
     this.lambdaFunctions = [];
-    // const authorizer = new apigatewayAuthorizers.HttpUserPoolAuthorizer({
-    //   userPool,
-    //   userPoolClient,
-    //   identitySource: ["$request.header.Authorization"]
-    // });
+    const authorizer = new apigatewayAuthorizers.HttpJwtAuthorizer({
+      jwtAudience: [clientCredsClientId],
+      jwtIssuer: props.issuer,
+      authorizerName: "awesome-jwt-authorizer",
+      identitySource: ["$request.header.Authorization"]
+    });
 
     for (const endpoint of props.endpoints) {
-      const platformHandlerFn = new lambdaNodeJs.NodejsFunction(
+      const handlerFn = new lambdaNodeJs.NodejsFunction(
         this,
         endpoint.id,
         endpoint.functionConfig
       );
 
-      this.lambdaFunctions.push(platformHandlerFn);
+      this.lambdaFunctions.push(handlerFn);
 
       const integration = new apigatewayIntegrations.LambdaProxyIntegration({
-        handler: platformHandlerFn
+        handler: handlerFn
       });
 
       if (endpoint.isAuthorized) {
-        // this.gateway.addRoutes({
-        //   path: endpoint.routeConfig.path,
-        //   methods: endpoint.routeConfig.methods,
-        //   integration: integration,
-        //   authorizer: authorizer
-        // });
+        this.gateway.addRoutes({
+          path: endpoint.routeConfig.path,
+          methods: endpoint.routeConfig.methods,
+          integration: integration,
+          authorizer: authorizer,
+          authorizationScopes: endpoint.routeConfig.scope
+        });
       } else {
         this.gateway.addRoutes({
           path: endpoint.routeConfig.path,

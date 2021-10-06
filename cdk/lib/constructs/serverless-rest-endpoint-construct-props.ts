@@ -9,6 +9,7 @@ interface EndpointConfig {
   routeConfig: {
     methods: HttpMethod[];
     path: string;
+    scope: string[];
   };
   isAuthorized: boolean;
 }
@@ -16,5 +17,6 @@ interface EndpointConfig {
 export interface ServerlessRestEndpointConstructProps extends cdk.StackProps {
   gatewayId: string;
   domainName: string;
+  issuer: string;
   endpoints: EndpointConfig[];
 }

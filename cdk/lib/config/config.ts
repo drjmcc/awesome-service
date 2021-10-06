@@ -11,6 +11,7 @@ export interface Config {
   awsRegion: string;
   outputPrefix: string;
   domainName: string;
+  issuer: string;
   environmentVariables: {
     [key: string]: string;
     releaseVersion: string;

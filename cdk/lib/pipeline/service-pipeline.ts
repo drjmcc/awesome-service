@@ -4,8 +4,6 @@ import * as pipelines from "@aws-cdk/pipelines";
 import * as codebuild from "@aws-cdk/aws-codebuild";
 import * as codepipeline from "@aws-cdk/aws-codepipeline";
 import * as codepipeline_actions from "@aws-cdk/aws-codepipeline-actions";
-import { AwesomeServicePipelineStage } from "../stages/service-pipeline-stage";
-import * as config from "../config";
 
 export class AwesomeServicePipelineStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
@@ -50,7 +48,7 @@ export class AwesomeServicePipelineStack extends cdk.Stack {
       synthAction,
       crossAccountKeys: true,
       pipelineName: "AwesomeServicePipeline",
-      cdkCliVersion: "1.114.0"
+      cdkCliVersion: "1.125.0"
     });
 
     // pipeline.addApplicationStage(
