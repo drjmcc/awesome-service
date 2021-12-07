@@ -59,6 +59,8 @@ export class ServerlessRestEndpointConstruct extends cdk.Construct {
 
       this.lambdaFunctions.push(handlerFn);
 
+      props.table.grantReadWriteData(handlerFn);
+
       const integration = new apigatewayIntegrations.LambdaProxyIntegration({
         handler: handlerFn
       });

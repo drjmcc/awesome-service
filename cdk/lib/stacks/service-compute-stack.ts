@@ -19,9 +19,9 @@ export class AwesomeServiceComputeStack extends cdk.Stack {
       {}
     );
 
-    const functionConfig: NodejsFunctionProps = {
-      entry: "lambdas/entrypoints/hello-world.ts",
-      handler: "helloWorld",
+    const createChatProps: NodejsFunctionProps = {
+      entry: "lambdas/entrypoints/create-chat-item.ts",
+      handler: "postChatItem",
       environment: deepmerge(baseEnvironmentVariables, {}),
       timeout: cdk.Duration.seconds(30),
       bundling: {
@@ -31,11 +31,34 @@ export class AwesomeServiceComputeStack extends cdk.Stack {
       architectures: [Architecture.ARM_64]
     };
 
-    const helloWorldConfig = {
+    const getChatProps: NodejsFunctionProps = {
+      entry: "lambdas/entrypoints/get-chat-item.ts",
+      handler: "getChatItem",
+      environment: deepmerge(baseEnvironmentVariables, {}),
+      timeout: cdk.Duration.seconds(30),
+      bundling: {
+        nodeModules: ["winston"],
+        externalModules: ["aws-sdk"]
+      },
+      architectures: [Architecture.ARM_64]
+    };
+
+    const createChatItemConfig = {
       id: "AwesomeServiceHelloWorld",
-      functionConfig: functionConfig,
+      functionConfig: createChatProps,
       routeConfig: {
         path: "/test",
+        methods: [HttpMethod.POST],
+        scope: ["awesome/read", "awesome/rw"]
+      },
+      isAuthorized: true
+    };
+
+    const getChatItemConfig = {
+      id: "AwesomeServiceGetChatItem",
+      functionConfig: getChatProps,
+      routeConfig: {
+        path: "/test/{id}",
         methods: [HttpMethod.GET],
         scope: ["awesome/read", "awesome/rw"]
       },
@@ -45,8 +68,9 @@ export class AwesomeServiceComputeStack extends cdk.Stack {
     new ServerlessRestEndpointConstruct(this, "AwesomeServiceRestEndpoint", {
       gatewayId: "AwesomeServiceApiGateway",
       domainName: props.config.domainName,
-      endpoints: [helloWorldConfig],
-      issuer: props.config.issuer
+      endpoints: [createChatItemConfig, getChatItemConfig],
+      issuer: props.config.issuer,
+      table: props.table
     });
   }
 }

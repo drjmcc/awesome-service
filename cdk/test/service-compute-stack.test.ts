@@ -3,10 +3,12 @@ import * as cdk from "@aws-cdk/core";
 import { expect, haveResource } from "@aws-cdk/assert";
 import { AwesomeServiceComputeStack } from "../lib/stacks/service-compute-stack";
 import { testConfig } from "./test-config";
+import { Table } from "@aws-cdk/aws-dynamodb";
 
 describe("Stack", () => {
   describe("Full stack deployment", () => {
     let stack: AwesomeServiceComputeStack;
+    let table: Table;
 
     beforeEach(() => {
       const app = new cdk.App();
@@ -15,7 +17,8 @@ describe("Stack", () => {
           account: "123456789",
           region: "eu-west-1"
         },
-        config: testConfig
+        config: testConfig,
+        table: table
       });
     });
 

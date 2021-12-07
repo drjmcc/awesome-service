@@ -1,6 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import * as lambdaNodeJs from "@aws-cdk/aws-lambda-nodejs";
-
+import { Table } from "@aws-cdk/aws-dynamodb";
 import { HttpMethod } from "@aws-cdk/aws-apigatewayv2/lib/http/route";
 
 interface EndpointConfig {
@@ -19,4 +19,5 @@ export interface ServerlessRestEndpointConstructProps extends cdk.StackProps {
   domainName: string;
   issuer: string;
   endpoints: EndpointConfig[];
+  table: Table;
 }

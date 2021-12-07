@@ -21,22 +21,28 @@ export const BadRequest = (
   };
 };
 
-export const NotFound: IResponse = {
-  statusCode: 404,
-  body: JSON.stringify({ message: "Not Found" }),
-  headers: { "Content-Type": "application/json" }
+export const NotFound = (): IResponse => {
+  return {
+    statusCode: 404,
+    body: JSON.stringify({ message: "Not Found" }),
+    headers: { "Content-Type": "application/json" }
+  };
 };
 
-export const ServiceError: IResponse = {
-  statusCode: 500,
-  body: JSON.stringify({ message: "A service error occurred." }),
-  headers: { "Content-Type": "application/json" }
+export const ServiceError = (): IResponse => {
+  return {
+    statusCode: 500,
+    body: JSON.stringify({ message: "A service error occurred." }),
+    headers: { "Content-Type": "application/json" }
+  };
 };
 
-export const Forbidden: IResponse = {
-  statusCode: 403,
-  body: JSON.stringify({ message: "Forbidden" }),
-  headers: { "Content-Type": "application/json" }
+export const Forbidden = (): IResponse => {
+  return {
+    statusCode: 403,
+    body: JSON.stringify({ message: "Forbidden" }),
+    headers: { "Content-Type": "application/json" }
+  };
 };
 
 export const Ok = (response: any = null): IResponse => {

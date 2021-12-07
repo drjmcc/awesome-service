@@ -22,7 +22,8 @@ export class AwesomeServicePipelineStage extends Stage {
           Application: "AwesomeService",
           Environment: id
         },
-        config: props.config
+        config: props.config,
+        table: props.table
       }
     );
   }

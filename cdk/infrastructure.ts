@@ -5,9 +5,26 @@ import * as cdk from "@aws-cdk/core";
 import * as config from "./lib/config";
 import { AwesomeServiceComputeStack } from "./lib/stacks";
 import { Config } from "./lib/config/config";
+import { AwesomeServiceDataStack } from "./lib/stacks/service-data-stack";
 
 const app = new cdk.App();
 const createNonPipelineStacks = (config: Config) => {
+  const dataStack = new AwesomeServiceDataStack(
+    app,
+    `${config.outputPrefix}AwesomeServiceDataStack`,
+    {
+      env: {
+        region: config.awsRegion,
+        account: config.awsAccountNumber
+      },
+      tags: {
+        Application: "AwesomeService",
+        Environment: config.outputPrefix
+      },
+      config: config
+    }
+  );
+
   new AwesomeServiceComputeStack(
     app,
     `${config.outputPrefix}AwesomeServiceComputeStack`,
@@ -20,7 +37,8 @@ const createNonPipelineStacks = (config: Config) => {
         Application: "AwesomeService",
         Environment: config.outputPrefix
       },
-      config: config
+      config: config,
+      table: dataStack.table
     }
   );
 };
